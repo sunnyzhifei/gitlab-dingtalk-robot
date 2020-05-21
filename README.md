@@ -1,4 +1,4 @@
-# gitlab2dingtalkrobot
+# gitlab-dingtalk-robot
 由于钉钉自带的gitlab机器人有些事件不支持通知，故自定义机器人
 钉钉webhook自定义机器人，实现gitlab 事件通知到钉钉，目前暂时只支持push event 和pipline event
 
