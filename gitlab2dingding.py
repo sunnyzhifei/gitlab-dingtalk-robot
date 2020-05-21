@@ -33,7 +33,7 @@ def post_ding(token, head, req):
     if head["GITLAB_EVENT"] == "Pipeline Hook":
         project = req["project"]["path_with_namespace"]
         commit = "[{sha}]({commit_url}): {message}".format(sha=req["commit"]["id"][0:8],commit_url=req["commit"]["url"],message=req["commit"]["message"])
-        author = req["commit"]["author"]["name"]
+        author = req["user"]["name"]
         ref = req["object_attributes"]["ref"]
         status = req["object_attributes"]["status"]
         pipline_id = req["object_attributes"]["id"]
@@ -52,6 +52,8 @@ def post_ding(token, head, req):
                 }
         if status == "success" or status == "failed":
             res = requests.post(url, headers=headers, data=json.dumps(data)).text
+        else:
+            res = "pipline status is not success or failed"
 
     elif head["GITLAB_EVENT"] == "Push Hook":
         project = req["project"]["path_with_namespace"]
