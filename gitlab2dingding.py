@@ -75,6 +75,33 @@ def post_ding(token, head, req):
                     }      
                 }
         res = requests.post(url, headers=headers, data=json.dumps(data)).text
+    elif head["GITLAB_EVENT"] == "Merge Request Hook":
+        print(req)
+        state = req["object_attributes"]["state"]
+        title = req["object_attributes"]["title"]
+        description = req["object_attributes"]["description"]
+        project = req["project"]["path_with_namespace"]
+        mergeUrl = req["object_attributes"]["url"]
+        author = req["user"]["name"]
+        assignees = req.get("assignees")
+        assignee = ''
+        if assignees:
+            assignee = assignees.get("name")
+        source_branch = req["object_attributes"]["source_branch"]
+        target_branch = req["object_attributes"]["target_branch"]
+        text = "<font size=1 face='Tahoma'>Merge Request Hook</font>\n\n<font size=1 face='Tahoma'>Title: [{title}]({mergeUrl})</font>\n\n<font size=1 face='Tahoma'>Description:  {description}</font>\n\n<font size=1 face='Tahoma'>Project:  {project}</font>\n\n<font size=1 face='Tahoma'>Author:  {author}</font>\n\n<font size=1 face='Tahoma'>Assignee: {assignee}</font>\n\n<font size=1 face='Tahoma'>Source_branch:  {source_branch}</font>\n\n<font size=1 face='Tahoma'>Target_branch:  {target_branch}</font>\n\n<font size=1 face='Tahoma'>State:  {state}</font>\n\n".format(title=title,mergeUrl=mergeUrl,description=description,project=project,author=author,assignee=assignee,source_branch=source_branch,target_branch=target_branch,state=state)
+        app.logger.debug(text)
+        data =  {
+                "msgtype": "markdown",
+                "markdown": {
+                    "title":"gitlab merge request event" ,
+                    "text": "{text}".format(text=text)
+                    },
+                "at": {
+                    "isAtAll": True
+                }   
+                }
+        res = requests.post(url, headers=headers, data=json.dumps(data)).text
     else:
         res = "not supported  Hook type"
 
