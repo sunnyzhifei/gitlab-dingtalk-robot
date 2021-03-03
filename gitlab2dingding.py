@@ -77,6 +77,10 @@ def post_ding(token, head, req):
         res = requests.post(url, headers=headers, data=json.dumps(data)).text
     elif head["GITLAB_EVENT"] == "Merge Request Hook":
         print(req)
+        file = open("dingUser.json",'r',encoding='utf-8')
+        ding_user = json.load(file)
+        file.close()
+
         state = req["object_attributes"]["state"]
         title = req["object_attributes"]["title"]
         description = req["object_attributes"]["description"]
@@ -85,13 +89,20 @@ def post_ding(token, head, req):
         author = req["user"]["name"]
         assignees = req.get("assignees")
         assignee = ''
+        atMobiles = []
+        atMobiles_string = ''
         if assignees:
             for a in assignees:
+                atMobiles.append(ding_user.get(a.get("username")))
                 assignee += a.get("name") + " "
+        if atMobiles:
+            for mobile in atMobiles:
+                atMobiles_string += "@" + mobile + " "
         source_branch = req["object_attributes"]["source_branch"]
         target_branch = req["object_attributes"]["target_branch"]
-        text = "<font size=1 face='Tahoma'>Merge Request Hook</font>\n\n<font size=1 face='Tahoma'>Title: [{title}]({mergeUrl})</font>\n\n<font size=1 face='Tahoma'>Description:  {description}</font>\n\n<font size=1 face='Tahoma'>Project:  {project}</font>\n\n<font size=1 face='Tahoma'>Author:  {author}</font>\n\n<font size=1 face='Tahoma'>Assignee: {assignee}</font>\n\n<font size=1 face='Tahoma'>Source_branch:  {source_branch}</font>\n\n<font size=1 face='Tahoma'>Target_branch:  {target_branch}</font>\n\n<font size=1 face='Tahoma'>State:  {state}</font>\n\n".format(title=title,mergeUrl=mergeUrl,description=description,project=project,author=author,assignee=assignee,source_branch=source_branch,target_branch=target_branch,state=state)
+        text = "<font size=1 face='Tahoma'>Merge Request Hook</font>\n\n<font size=1 face='Tahoma'>Title: [{title}]({mergeUrl})</font>\n\n<font size=1 face='Tahoma'>Description:  {description}</font>\n\n<font size=1 face='Tahoma'>Project:  {project}</font>\n\n<font size=1 face='Tahoma'>Author:  {author}</font>\n\n<font size=1 face='Tahoma'>Assignee: {assignee}</font>\n\n<font size=1 face='Tahoma'>Source_branch:  {source_branch}</font>\n\n<font size=1 face='Tahoma'>Target_branch:  {target_branch}</font>\n\n<font size=1 face='Tahoma'>State:  {state}</font>\n\n<font size=1 face='Tahoma'>{atMobiles_string}</font>\n\n".format(title=title,mergeUrl=mergeUrl,description=description,project=project,author=author,assignee=assignee,source_branch=source_branch,target_branch=target_branch,state=state,atMobiles_string=atMobiles_string)
         app.logger.debug(text)
+        
         data =  {
                 "msgtype": "markdown",
                 "markdown": {
@@ -99,9 +110,11 @@ def post_ding(token, head, req):
                     "text": "{text}".format(text=text)
                     },
                 "at": {
-                    "isAtAll": True
+                    "atMobiles": atMobiles,
+                    "isAtAll": False
                 }   
                 }
+        print(data)
         res = requests.post(url, headers=headers, data=json.dumps(data)).text
     else:
         res = "not supported  Hook type"
