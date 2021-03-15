@@ -37,11 +37,14 @@ def post_ding(token, head, req):
         ref = req["object_attributes"]["ref"]
         status = req["object_attributes"]["status"]
         pipline_id = req["object_attributes"]["id"]
+        job_id = str(req["builds"][0]["id"])
+        job_url = "http://git.iwellmass.com/" + project + "/-/jobs/" + job_id
+        job = "[{job_id}]({job_url})".format(job_id=job_id, job_url=job_url)
                
         if status == "success":
-            text = "<font color=#008000  face='Tahoma'>Pipeline Hook: {status}</font>\n\n <font size=1 face='Tahoma'>Project:  {project}</font>\n\n <font size=1 face='Tahoma'>Branch:  {ref}</font>\n\n <font size=1 face='Tahoma'>Author:  {author}</font>\n\n <font size=1 face='Tahoma'>Commit: </font>\n\n > {commit}\n\n <font size=1 face='Tahoma'>[See More in GitLab](http://git.iwellmass.com/{project}/pipelines/{pipline_id})</font>".format(project=project,author=author,ref=ref,status=status,commit=commit,pipline_id=pipline_id)
+            text = "<font color=#008000  face='Tahoma'>Pipeline Hook: {status}</font>\n\n <font size=1 face='Tahoma'>Project:  {project}</font>\n\n <font size=1 face='Tahoma'>Branch:  {ref}</font>\n\n <font size=1 face='Tahoma'>Author:  {author}</font>\n\n <font size=1 face='Tahoma'>JobId:  {job}</font>\n\n <font size=1 face='Tahoma'>Commit: </font>\n\n > {commit}\n\n <font size=1 face='Tahoma'>[See More in GitLab](http://git.iwellmass.com/{project}/pipelines/{pipline_id})</font>".format(project=project,author=author,ref=ref,status=status,commit=commit,pipline_id=pipline_id,job=job)
         else:
-            text = "<font color=#FF0000  face='Tahoma'>Pipeline Hook: {status}</font>\n\n <font size=1 face='Tahoma'>Project:  {project}</font>\n\n <font size=1 face='Tahoma'>Branch:  {ref}</font>\n\n <font size=1 face='Tahoma'>Author:  {author}</font>\n\n <font size=1 face='Tahoma'>Commit: </font>\n\n > {commit}\n\n <font size=1 face='Tahoma'>[See More in GitLab](http://git.iwellmass.com/{project}/pipelines/{pipline_id})</font>".format(project=project,author=author,ref=ref,status=status,commit=commit,pipline_id=pipline_id)
+            text = "<font color=#FF0000  face='Tahoma'>Pipeline Hook: {status}</font>\n\n <font size=1 face='Tahoma'>Project:  {project}</font>\n\n <font size=1 face='Tahoma'>Branch:  {ref}</font>\n\n <font size=1 face='Tahoma'>Author:  {author}</font>\n\n <font size=1 face='Tahoma'>JobId:  {job}</font>\n\n <font size=1 face='Tahoma'>Commit: </font>\n\n > {commit}\n\n <font size=1 face='Tahoma'>[See More in GitLab](http://git.iwellmass.com/{project}/pipelines/{pipline_id})</font>".format(project=project,author=author,ref=ref,status=status,commit=commit,pipline_id=pipline_id,job=job)
         app.logger.debug(text)
         data =  {
                 "msgtype": "markdown",
