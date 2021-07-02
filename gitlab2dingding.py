@@ -38,7 +38,7 @@ def post_ding(token, head, req):
         status = req["object_attributes"]["status"]
         pipline_id = req["object_attributes"]["id"]
         job_id = str(req["builds"][0]["id"])
-        job_url = "http://git.iwellmass.com/" + project + "/-/jobs/" + job_id
+        job_url = "http://git.xxx.com/" + project + "/-/jobs/" + job_id
         job = "[{job_id}]({job_url})".format(job_id=job_id, job_url=job_url)
                
         if status == "success":
